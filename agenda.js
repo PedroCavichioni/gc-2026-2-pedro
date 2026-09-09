@@ -55,13 +55,21 @@ function renderizar() {
   lista.innerHTML = "";
 
   if (consultas.length === 0) {
-    lista.innerHTML = '<tr><td colspan="4" class="vazio">Nenhuma consulta agendada.</td></tr>';
+    lista.innerHTML = '<tr><td colspan="5" class="vazio">Nenhuma consulta agendada.</td></tr>';
     return;
   }
 
-  for (const c of consultas) {
+  for (const [indice, c] of consultas.entries()) {
     const linha = document.createElement("tr");
-    linha.innerHTML = `<td>${c.data}</td><td>${c.hora}</td><td>${c.profissional}</td><td>${c.paciente}</td>`;
+
+    linha.innerHTML = `
+    <td>${c.data}</td>
+    <td>${c.hora}</td>
+    <td>${c.profissional}</td>
+    <td>${c.paciente}</td>
+    <td><button type="button" class="excluir" data-indice="${indice}">Excluir</button></td>
+  `;
+
     lista.appendChild(linha);
   }
 }
@@ -87,6 +95,18 @@ formulario.addEventListener("submit", (evento) => {
   salvar(consultas);
   mensagem.textContent = "Consulta agendada.";
   formulario.reset();
+  renderizar();
+});
+
+lista.addEventListener("click", (evento) => {
+  if (!evento.target.classList.contains("excluir")) return;
+
+  const indice = Number(evento.target.dataset.indice);
+  const consultas = carregar();
+
+  consultas.splice(indice, 1);
+  salvar(consultas);
+  mensagem.textContent = "Consulta excluída.";
   renderizar();
 });
 
